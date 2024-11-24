@@ -1,6 +1,6 @@
 // Written by Mikhail Ortiz-Lunyov
 //
-// Version 0.0.2
+// Version 1.0.0-release
 
 /*
 Go UNIX package detector
@@ -28,9 +28,9 @@ import (
 
 // Constants related to versions
 const (
-	short_VERSION_NUM string = "0.0.1"
-	version_NAME      string = "November 18th, 2024"
-	dev_MARKER        string = "-alpha"
+	short_VERSION_NUM string = "1.0.0"
+	version_NAME      string = "November 23rd, 2024"
+	dev_MARKER        string = "-release"
 	full_VERSION      string = "v" + short_VERSION_NUM + dev_MARKER + " ( " + version_NAME + ")"
 )
 
@@ -108,8 +108,8 @@ func pruneSlice(sliceToPrune []string) []string {
 	return prunedSliceToReturn
 }
 
-// Method used to check if directory contains binary with the name of a package manager listed above.
-func checkPkgManBinaries(directory string, official bool) []string {
+// Method used to check if directory contains binary with the name of a listed package manager
+func checkPkgManBinaryName(directory string, official bool) []string {
 	// Initialise variables
 	var returnPkgMan []string = []string{}
 
@@ -149,13 +149,13 @@ func searchUserPATH() ([]string, []string) {
 	// // Get the path of the directories in $PATH variable
 	var pathDirectories []string = strings.Split(os.Getenv("PATH"), ":")
 	// // Get the names of identified package managers from a PATH directory
-	var identifiedOfficialPkgMan []string = []string{}
-	var identifiedAlternativePkgMan []string = []string{}
+	var identifiedOfficialPkgMan []string
+	var identifiedAlternativePkgMan []string
 
 	// Iterate through user's $PATH variable, checking the binaries that exist
 	for _, directory := range pathDirectories {
-		identifiedOfficialPkgMan = append(identifiedOfficialPkgMan, checkPkgManBinaries(directory, true)...)
-		identifiedAlternativePkgMan = append(identifiedAlternativePkgMan, checkPkgManBinaries(directory, false)...)
+		identifiedOfficialPkgMan = append(identifiedOfficialPkgMan, checkPkgManBinaryName(directory, true)...)
+		identifiedAlternativePkgMan = append(identifiedAlternativePkgMan, checkPkgManBinaryName(directory, false)...)
 	}
 
 	return identifiedOfficialPkgMan, identifiedAlternativePkgMan
@@ -176,6 +176,7 @@ func main() {
 		fmt.Println(full_VERSION)
 		os.Exit(0)
 	}
+
 	official, alternative := Report()
 	fmt.Println("Official package managers: ", official)
 	fmt.Println("Alternative package mangers: ", alternative)
