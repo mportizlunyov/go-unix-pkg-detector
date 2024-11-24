@@ -1,6 +1,6 @@
 // Written by Mikhail Ortiz-Lunyov
 //
-// Version 0.0.1
+// Version 0.0.2
 
 /*
 Go UNIX package detector
@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"slices"
 	"strings"
 )
 
@@ -67,27 +66,46 @@ var alternativePackageNameArray = [...]string{
 }
 
 // Primary method used to return the detected package managers
-func Report(pkgType int) ([]string, []string) {
-	// TODO: Implement
-	return nil, nil
+func Report() ([]string, []string) {
+	// Initialises variables
+	var officialPkgsCollected []string
+	var alternativePkgsCollected []string
+
+	// Get results from $PATH, and append to internal slices
+	collectedOffTemp, collectedAltTemp := searchUserPATH()
+	officialPkgsCollected = append(officialPkgsCollected, collectedOffTemp...)
+	alternativePkgsCollected = append(collectedAltTemp, collectedAltTemp...)
+
+	// Return collected package managers, pruning duplicates
+	return pruneSlice(officialPkgsCollected), pruneSlice(alternativePkgsCollected)
+}
+
+// Helper method to check if an item exists in a slice
+func contains(sliceToInvestigage []string, searchItem string) bool {
+	for _, item := range sliceToInvestigage {
+		if searchItem == item {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Helper method to delete duplicate values in a slice
 func pruneSlice(sliceToPrune []string) []string {
 	// Initialise variables
-	var prunedSlice []string = sliceToPrune
+	var prunedSliceToReturn []string
 
-	// Iterate through sliceToPrune, checking if
-	// for index, item := range prunedSlice {
-	// 	if index+1 < len(prunedSlice)-1 && prunedSlice[index+1] == item {
-	// 		prunedSlice = append(prunedSlice[:index], prunedSlice[index+1:]...)
-	// 	}
-	// }
+	// Iterate through sliceToPrune, adding unique variables
+	for _, item := range sliceToPrune {
+		if len(prunedSliceToReturn) == 0 || contains(sliceToPrune, item) {
+			prunedSliceToReturn = append(prunedSliceToReturn, item)
+		} else {
+			continue
+		}
+	}
 
-	slices.Sort(prunedSlice)
-	prunedSlice = slices.Compact(prunedSlice)
-
-	return prunedSlice
+	return prunedSliceToReturn
 }
 
 // Method used to check if directory contains binary with the name of a package manager listed above.
@@ -140,7 +158,7 @@ func searchUserPATH() ([]string, []string) {
 		identifiedAlternativePkgMan = append(identifiedAlternativePkgMan, checkPkgManBinaries(directory, false)...)
 	}
 
-	return pruneSlice(identifiedOfficialPkgMan), pruneSlice(identifiedAlternativePkgMan)
+	return identifiedOfficialPkgMan, identifiedAlternativePkgMan
 }
 
 // Main method to demonstrate capabilities of this package.
@@ -159,5 +177,5 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println(searchUserPATH())
+	fmt.Println(Report())
 }
