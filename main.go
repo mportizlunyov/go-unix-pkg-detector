@@ -28,10 +28,10 @@ import (
 
 // Constants related to versions
 const (
-	SHORT_VERSION_NUM string = "0.0.1"
-	VERSION_NAME      string = "November 18th, 2024"
-	DEV_MARKER        string = "-alpha"
-	FULL_VERSION      string = "v" + SHORT_VERSION_NUM + DEV_MARKER + " ( " + VERSION_NAME + ")"
+	short_VERSION_NUM string = "0.0.1"
+	version_NAME      string = "November 18th, 2024"
+	dev_MARKER        string = "-alpha"
+	full_VERSION      string = "v" + short_VERSION_NUM + dev_MARKER + " ( " + version_NAME + ")"
 )
 
 // Field containg the names of the official package managers to check for.
@@ -98,7 +98,7 @@ func pruneSlice(sliceToPrune []string) []string {
 
 	// Iterate through sliceToPrune, adding unique variables
 	for _, item := range sliceToPrune {
-		if len(prunedSliceToReturn) == 0 || contains(sliceToPrune, item) {
+		if len(prunedSliceToReturn) == 0 || !contains(sliceToPrune, item) {
 			prunedSliceToReturn = append(prunedSliceToReturn, item)
 		} else {
 			continue
@@ -173,9 +173,10 @@ func main() {
 	versionFlag := *versionShort || *versionLong
 	// Print version and exit if requested
 	if versionFlag {
-		fmt.Println(FULL_VERSION)
+		fmt.Println(full_VERSION)
 		os.Exit(0)
 	}
-
-	fmt.Println(Report())
+	official, alternative := Report()
+	fmt.Println("Official package managers: ", official)
+	fmt.Println("Alternative package mangers: ", alternative)
 }
