@@ -1,6 +1,6 @@
 // Written by Mikhail Ortiz-Lunyov
 //
-// Version 1.0.1-release
+// Version 1.0.3-release
 
 /*
 Go UNIX package detector
@@ -19,8 +19,6 @@ package main
 
 // Import packages
 import (
-	"flag"
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -31,7 +29,7 @@ import (
 
 // Constants related to versions
 const (
-	short_VERSION_NUM string = "1.0.1"
+	short_VERSION_NUM string = "1.0.3"
 	version_NAME      string = "November 24th, 2024"
 	dev_MARKER        string = "-release"
 	full_VERSION      string = "v" + short_VERSION_NUM + dev_MARKER + " ( " + version_NAME + ")"
@@ -161,25 +159,4 @@ func searchUserPATH() ([]string, []string) {
 	}
 
 	return identifiedOfficialPkgMan, identifiedAlternativePkgMan
-}
-
-// Main method to demonstrate capabilities of this package.
-func main() {
-	// Check flags
-	// // -v / --version
-	versionShort := flag.Bool("v", false, "Print the version number of this module")
-	versionLong := flag.Bool("version", false, "Long form of [-v]")
-	// // Parse flags
-	flag.Parse()
-	// // // Finalise flags
-	versionFlag := *versionShort || *versionLong
-	// Print version and exit if requested
-	if versionFlag {
-		fmt.Println(full_VERSION)
-		os.Exit(0)
-	}
-
-	official, alternative := Report()
-	fmt.Println("Official package managers: ", official)
-	fmt.Println("Alternative package mangers: ", alternative)
 }
