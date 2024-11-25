@@ -1,6 +1,6 @@
 // Written by Mikhail Ortiz-Lunyov
 //
-// Version 1.0.0-release
+// Version 1.0.1-release
 
 /*
 Go UNIX package detector
@@ -11,6 +11,9 @@ and report them by by calling the report() method.
 While not official intended to run as a stand-alone package,
 more like a library to implement,
 a main() method is provided to demonstrate the capacities of the program.
+
+When getting the package managers, one needs to call the Report() method to get
+both official and alternative package managers.
 */
 package main
 
@@ -28,8 +31,8 @@ import (
 
 // Constants related to versions
 const (
-	short_VERSION_NUM string = "1.0.0"
-	version_NAME      string = "November 23rd, 2024"
+	short_VERSION_NUM string = "1.0.1"
+	version_NAME      string = "November 24th, 2024"
 	dev_MARKER        string = "-release"
 	full_VERSION      string = "v" + short_VERSION_NUM + dev_MARKER + " ( " + version_NAME + ")"
 )
@@ -111,7 +114,8 @@ func pruneSlice(sliceToPrune []string) []string {
 // Method used to check if directory contains binary with the name of a listed package manager
 func checkPkgManBinaryName(directory string, official bool) []string {
 	// Initialise variables
-	var returnPkgMan []string = []string{}
+	var returnPkgMan []string
+	var referencePkgManList []string
 
 	// Read the contents of the directory, if possible
 	entries, err := os.ReadDir(directory)
@@ -119,23 +123,21 @@ func checkPkgManBinaryName(directory string, official bool) []string {
 		log.Fatal(err)
 	}
 
+	// Set the reference list
+	switch official {
+	case true:
+		referencePkgManList = officialPackageNameArray[:]
+	case false:
+		referencePkgManList = alternativePackageNameArray[:]
+	}
+
 	// Iterate through contents of the directory, appending names appearing in the above fields
 	for _, file := range entries {
-		// Iterate through relevent lists, adding to returnPkgMan when needed
-		switch official {
-		case true:
-			for _, pkgMan := range officialPackageNameArray {
-				switch file.Name() {
-				case pkgMan:
-					returnPkgMan = append(returnPkgMan, file.Name())
-				}
-			}
-		case false:
-			for _, pkgMan := range alternativePackageNameArray {
-				switch file.Name() {
-				case pkgMan:
-					returnPkgMan = append(returnPkgMan, file.Name())
-				}
+		// // Iterate through relevent lists, adding to returnPkgMan when needed
+		for _, pkgMan := range referencePkgManList {
+			switch file.Name() {
+			case pkgMan:
+				returnPkgMan = append(returnPkgMan, file.Name())
 			}
 		}
 	}
